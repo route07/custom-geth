@@ -1,0 +1,12 @@
+# Dockerfile
+FROM golang:1.23 AS builder
+
+WORKDIR /app
+COPY . .
+
+RUN make geth
+
+FROM ubuntu:22.04
+COPY --from=builder /app/build/bin/geth /usr/local/bin/geth
+
+ENTRYPOINT ["geth"]

@@ -155,3 +155,22 @@ func TestTimestampCompatError(t *testing.T) {
 	require.Equal(t, newTimestampCompatError(errWhat, newUint64(0), newUint64(1681338455)).Error(),
 		"mismatching Shanghai fork timestamp in database (have timestamp 0, want timestamp 1681338455, rewindto timestamp 0)")
 }
+
+// TestIBFTConfig tests the IBFT config
+func TestIBFTChainConfigUnmarshal(t *testing.T) {
+	json := `{
+		"chainId": 1337,
+		"ibft": {
+			"blockperiodseconds": 5,
+			"epochlength": 30000,
+			"requesttimeoutseconds": 10,
+			"policy": 0,
+			"ceil2Nby3Block": 0
+		}
+	}`
+
+	var cfg ChainConfig
+	if err := json.Unmarshal([]byte(json), &cfg); err != nil {
+		t.Fatal(err)
+	}
+}

@@ -35,6 +35,8 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 	"github.com/ethereum/go-ethereum/miner"
 	"github.com/ethereum/go-ethereum/params"
+
+	ibftengine "github.com/route07/custom-geth/consensus/istanbul/ibft/engine"
 )
 
 // FullNodeGPO contains default gasprice oracle settings for full node.
@@ -172,6 +174,12 @@ func CreateConsensusEngine(config *params.ChainConfig, db ethdb.Database) (conse
 		log.Error("Geth only supports PoS networks. Please transition legacy networks using Geth v1.13.x.")
 		return nil, fmt.Errorf("'terminalTotalDifficulty' is not set in genesis block")
 	}
+	// IBFT2 support
+	if config.IBFT != nil {
+		log.Info("Using IBFT2 consensus engine")
+		return ibftengine.New(config.IBFT, config, db), nil
+	}	
+	
 	// Wrap previously supported consensus engines into their post-merge counterpart
 	if config.Clique != nil {
 		return beacon.New(clique.New(config.Clique, db)), nil
