@@ -521,3 +521,24 @@ func PrepareCommittedSeal(hash common.Hash) []byte {
 	buf.Write([]byte{byte(ibfttypes.MsgCommit)})
 	return buf.Bytes()
 }
+
+func New(cfg *params.IBFTConfig, chainCfg *params.ChainConfig, db ethdb.Database) consensus.Engine {
+	istanbulCfg := &istanbul.Config{
+		ChainConfig:               chainCfg,
+		BlockPeriod:               cfg.BlockPeriodSeconds,
+		Epoch:                     cfg.EpochLength,
+		RequestTimeout:            cfg.RequestTimeoutSeconds,
+		ValidatorContract:         common.Address{},
+		ValidatorSelectionMode:    params.InlineMode,
+		Ceil2Nby3Block:            cfg.Ceil2Nby3Block,
+		AllowedFutureBlockTime:    5,
+	}
+
+	signer := common.HexToAddress("0x0000000000000000000000000000000000000000") // use actual or injected key
+	signFn := func(data []byte) ([]byte, error) {
+		// stubbed signer - replace with real key signer or external hook
+		return []byte{}, nil
+	}
+
+	return NewEngine(istanbulCfg, signer, signFn)
+}
